@@ -22,7 +22,7 @@ async function uploadFile() {
     formData.append("resume", file);
 
     try {
-        const response = await fetch("https://YOUR-RENDER-URL.onrender.com/analyze", {
+        const response = await fetch("https://resume-analyzer-ehx2.onrender.com/analyze", {
             method: "POST",
             body: formData
         });
