@@ -5,6 +5,10 @@ import PyPDF2
 app = Flask(__name__)
 CORS(app)
 
+@app.route("/")
+def home():
+    return "AI Resume Analyzer Backend Running 🚀"
+
 def extract_text(file):
     reader = PyPDF2.PdfReader(file)
     text = ""

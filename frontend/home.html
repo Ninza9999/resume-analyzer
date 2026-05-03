@@ -149,7 +149,7 @@ async function uploadFile() {
     formData.append("resume", selectedFile);
     formData.append("job_role", document.getElementById("jobRole").value);
 
-    const response = await fetch("http://127.0.0.1:5000/analyze", {
+    const response = await fetch("https://resume-analyzer-ehx2.onrender.com", {
         method: "POST",
         body: formData
     });
