@@ -1,59 +1,107 @@
 body {
     margin: 0;
-    font-family: Arial;
+    font-family: 'Segoe UI', sans-serif;
     color: white;
     text-align: center;
 }
 
+/* 🎥 Video */
 #bg-video {
     position: fixed;
     right: 0;
     bottom: 0;
     min-width: 100%;
     min-height: 100%;
+    object-fit: cover;
     z-index: -2;
 }
 
+/* Overlay */
 .overlay {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.75);
     z-index: -1;
 }
 
+/* Glass UI */
 .container {
     margin-top: 100px;
-    background: rgba(20,20,20,0.8);
-    padding: 30px;
-    border-radius: 15px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+    padding: 40px;
+    border-radius: 20px;
     display: inline-block;
+    width: 350px;
 }
 
+/* Upload box */
 .upload-box {
-    border: 2px dashed #888;
+    border: 2px dashed #aaa;
     padding: 20px;
     margin: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
+    transition: 0.3s;
 }
 
+.upload-box:hover {
+    border-color: #00c6ff;
+}
+
+/* Button */
 button {
-    padding: 10px 20px;
-    background: #00c6ff;
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     color: white;
     cursor: pointer;
+    font-weight: bold;
 }
 
+/* Loader */
 .loader {
     display: none;
     margin: 20px;
 }
 
+.spinner {
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top: 4px solid #00c6ff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+/* Cards */
 .card {
     background: rgba(255,255,255,0.1);
-    margin: 10px;
-    padding: 10px;
-    border-radius: 10px;
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+/* Skill chips */
+.chip {
+    display: inline-block;
+    padding: 6px 10px;
+    margin: 5px;
+    background: rgba(0,198,255,0.2);
+    border-radius: 8px;
+}
+
+/* Fade animation */
+.fade {
+    opacity: 0;
+    transition: opacity 0.8s;
+}
+.fade.show {
+    opacity: 1;
 }

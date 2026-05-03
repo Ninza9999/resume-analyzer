@@ -17,7 +17,7 @@
 <div class="container">
 
     <h1>🚀 AI Resume Analyzer</h1>
-    <p class="subtitle">Get instant ATS score & AI insights</p>
+    <p class="subtitle">Smart ATS scoring & AI-powered insights</p>
 
     <!-- Upload Box -->
     <div class="upload-box" id="drop-area">
@@ -29,13 +29,16 @@
     <button onclick="uploadFile()">Analyze Resume</button>
 
     <!-- Loader -->
-    <div id="loader" class="loader">Analyzing...</div>
+    <div id="loader" class="loader">
+        <div class="spinner"></div>
+        <p>Analyzing your resume...</p>
+    </div>
 
     <!-- Chart -->
     <canvas id="scoreChart"></canvas>
 
     <!-- Results -->
-    <div id="result"></div>
+    <div id="result" class="fade"></div>
 
 </div>
 

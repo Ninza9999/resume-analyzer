@@ -16,6 +16,7 @@ async function uploadFile() {
     }
 
     loader.style.display = "block";
+    result.classList.remove("show");
     result.innerHTML = "";
 
     const formData = new FormData();
@@ -37,21 +38,29 @@ async function uploadFile() {
             type: "doughnut",
             data: {
                 datasets: [{
-                    data: [data.match_percentage, 100 - data.match_percentage]
+                    data: [data.match_percentage, 100 - data.match_percentage],
+                    backgroundColor: ["#00c6ff", "#333"]
                 }]
             },
             options: {
-                cutout: "70%"
+                cutout: "75%",
+                plugins: { legend: { display: false } }
             }
         });
+
+        // Skills UI
+        let skillsHTML = data.skills.map(s => `<span class="chip">${s}</span>`).join("");
+        let missingHTML = data.missing.map(s => `<span class="chip">${s}</span>`).join("");
 
         result.innerHTML = `
             <div class="card">🔥 Score: ${data.score}/10</div>
             <div class="card">📊 Match: ${data.match_percentage}%</div>
-            <div class="card">🧠 Skills: ${data.skills.join(", ")}</div>
-            <div class="card">⚠ Missing: ${data.missing.join(", ")}</div>
+            <div class="card">🧠 Skills:<br>${skillsHTML}</div>
+            <div class="card">⚠ Missing:<br>${missingHTML}</div>
             <div class="card">💡 ${data.evaluation}</div>
         `;
+
+        result.classList.add("show");
 
     } catch (err) {
         loader.style.display = "none";
