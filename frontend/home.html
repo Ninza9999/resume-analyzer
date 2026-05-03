@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AI Resume Analyzer</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* 🔥 LIVE ANIMATED BACKGROUND */
+    background:
+        linear-gradient(rgba(20,30,60,0.7), rgba(20,30,60,0.7)),
+        url("https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif");
+
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+/* Glass container */
+.container {
+    backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.08);
+    padding: 35px;
+    border-radius: 20px;
+    width: 450px;
+    text-align: center;
+    box-shadow: 0px 10px 40px rgba(0,0,0,0.4);
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+.subtext {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 10px;
+    width: 90%;
+}
+
+/* Upload box */
+.drop-area {
+    border: 2px dashed rgba(255,255,255,0.4);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.drop-area:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+button {
+    padding: 12px 25px;
+    background: #00c6ff;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+.loader {
+    display: none;
+    margin-top: 15px;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.trust {
+    font-size: 11px;
+    margin-top: 10px;
+    opacity: 0.7;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🚀 AI Resume Analyzer</h1>
+    <div class="subtext">AI-powered resume evaluation for accurate insights</div>
+
+    <input type="text" id="jobRole" placeholder="Target Role">
+
+    <div class="drop-area" onclick="document.getElementById('fileInput').click()">
+        Upload Resume (PDF)
+    </div>
+
+    <input type="file" id="fileInput" hidden>
+
+    <button onclick="uploadFile()">Analyze</button>
+
+    <div class="loader" id="loader">Analyzing...</div>
+
+    <div id="result"></div>
+
+    <div class="trust">
+        ✔ Secure • ✔ No data stored • ✔ AI-powered insights
+    </div>
+
+</div>
+
+<script>
+let selectedFile;
+
+document.getElementById("fileInput").addEventListener("change", e => {
+    selectedFile = e.target.files[0];
+});
+
+async function uploadFile() {
+    if (!selectedFile) {
+        alert("Select file first");
+        return;
+    }
+
+    const loader = document.getElementById("loader");
+    const result = document.getElementById("result");
+
+    loader.style.display = "block";
+    result.innerHTML = "";
+
+    const formData = new FormData();
+    formData.append("resume", selectedFile);
+    formData.append("job_role", document.getElementById("jobRole").value);
+
+    const response = await fetch("http://127.0.0.1:5000/analyze", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await response.json();
+
+    loader.style.display = "none";
+
+    result.innerHTML = `
+        <div class="card"><b>Match:</b> ${data.match_percentage}%</div>
+        <div class="card"><b>Score:</b> ${data.score}/10</div>
+        <div class="card"><b>Skills:</b> ${data.skills.join(", ")}</div>
+        <div class="card"><b>Missing:</b> ${data.missing.join(", ")}</div>
+        <div class="card"><b>Summary:</b> ${data.summary}</div>
+        <div class="card"><b>Evaluation:</b> ${data.evaluation}</div>
+        <div class="card"><b>Recommendation:</b> ${data.recommendation}</div>
+    `;
+}
+</script>
+
+</body>
+</html>
