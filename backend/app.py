@@ -9,72 +9,41 @@ CORS(app)
 def home():
     return "AI Resume Analyzer Backend Running 🚀"
 
-def extract_text(file):
-    reader = PyPDF2.PdfReader(file)
-    text = ""
-    for page in reader.pages:
-        content = page.extract_text()
-        if content:
-            text += content
-    return text
-
-def analyze_text(text):
-    skills_list = [
-        "python", "machine learning", "sql",
-        "data science", "deep learning", "flask"
-    ]
-
-    found_skills = []
-    missing_skills = []
-
-    text_lower = text.lower()
-
-    for skill in skills_list:
-        if skill in text_lower:
-            found_skills.append(skill.title())
-        else:
-            missing_skills.append(skill.title())
-
-    score = int((len(found_skills) / len(skills_list)) * 10)
-    match_percentage = int((len(found_skills) / len(skills_list)) * 100)
-
-    return found_skills, missing_skills, score, match_percentage
-
-@app.route('/analyze', methods=['POST'])
+@app.route("/analyze", methods=["POST"])
 def analyze_resume():
-    file = request.files.get('resume')
-    job_role = request.form.get('job_role', 'General Role')
+    if 'resume' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
 
-    if file is None:
-        return jsonify({"error": "No file received"}), 400
+    file = request.files['resume']
 
-    text = extract_text(file)
+    try:
+        pdf_reader = PyPDF2.PdfReader(file)
+        text = ""
 
-    if text.strip() == "":
-        return jsonify({"error": "Could not extract text"}), 400
+        for page in pdf_reader.pages:
+            text += page.extract_text() or ""
 
-    skills, missing, score, match_percentage = analyze_text(text)
+        text = text.lower()
 
-    if score >= 8:
-        evaluation = "Strong profile with good technical skills."
-    elif score >= 5:
-        evaluation = "Average profile with room for improvement."
-    else:
-        evaluation = "Weak profile, needs improvement."
+        skills_list = ["python", "machine learning", "data science", "sql", "flask", "deep learning"]
+        found_skills = [skill for skill in skills_list if skill in text]
+        missing_skills = [skill for skill in skills_list if skill not in text]
 
-    summary = f"For a {job_role}, your resume shows strength in {', '.join(skills[:2])}. Improve {', '.join(missing[:2])}."
+        score = len(found_skills) * 2
+        match_percentage = int((len(found_skills) / len(skills_list)) * 100)
 
-    return jsonify({
-        "score": score,
-        "match_percentage": match_percentage,
-        "skills": skills,
-        "missing": missing,
-        "evaluation": evaluation,
-        "summary": summary,
-        "recommendation": f"Focus on improving: {', '.join(missing)}"
-    })
+        return jsonify({
+            "score": score,
+            "match_percentage": match_percentage,
+            "skills": found_skills,
+            "missing": missing_skills,
+            "evaluation": "Strong profile 🚀" if score >= 6 else "Needs improvement ⚠️",
+            "summary": f"Found {len(found_skills)} relevant skills in your resume."
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)
-if __name__ == "__main__":
-    app.run()
