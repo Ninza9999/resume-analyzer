@@ -3,70 +3,43 @@ from flask_cors import CORS
 import PyPDF2
 
 app = Flask(__name__)
-CORS(app)  # allows frontend (Netlify) to talk to backend
+CORS(app)
 
-# 🔥 Skills database (you can expand this later)
-SKILLS_DB = [
-    "Python", "Machine Learning", "Deep Learning",
-    "Flask", "Django", "SQL", "Data Science",
-    "Pandas", "NumPy", "TensorFlow", "PyTorch"
-]
+SKILLS = ["python", "machine learning", "sql", "data science", "flask", "deep learning"]
 
-# 📄 Extract text from PDF
-def extract_text_from_pdf(file):
+def extract_text(file):
+    reader = PyPDF2.PdfReader(file)
     text = ""
-    pdf_reader = PyPDF2.PdfReader(file)
-    for page in pdf_reader.pages:
+    for page in reader.pages:
         text += page.extract_text() or ""
     return text.lower()
 
-# 🚀 Analyze Resume
+@app.route('/')
+def home():
+    return "Backend running"
+
 @app.route('/analyze', methods=['POST'])
-def analyze_resume():
-    try:
-        file = request.files.get('resume')
+def analyze():
+    file = request.files.get("resume")
 
-        if not file:
-            return jsonify({"error": "No file uploaded"}), 400
+    if not file:
+        return jsonify({"error": "No file"}), 400
 
-        # Extract text
-        resume_text = extract_text_from_pdf(file)
+    text = extract_text(file)
 
-        # Detect skills
-        found_skills = []
-        missing_skills = []
+    found = [s for s in SKILLS if s in text]
+    missing = [s for s in SKILLS if s not in text]
 
-        for skill in SKILLS_DB:
-            if skill.lower() in resume_text:
-                found_skills.append(skill)
-            else:
-                missing_skills.append(skill)
+    score = round(len(found)/len(SKILLS)*10)
+    match = round(len(found)/len(SKILLS)*100)
 
-        # Score calculation
-        score = round(len(found_skills) / len(SKILLS_DB) * 10)
-        match_percentage = round(len(found_skills) / len(SKILLS_DB) * 100)
+    return jsonify({
+        "score": score,
+        "match_percentage": match,
+        "skills": found,
+        "missing": missing,
+        "evaluation": "Good profile" if score >=5 else "Needs improvement"
+    })
 
-        # Smart evaluation
-        if score >= 8:
-            evaluation = "Excellent profile 🚀"
-        elif score >= 5:
-            evaluation = "Good profile, can improve 👍"
-        else:
-            evaluation = "Needs improvement ⚠️"
-
-        return jsonify({
-            "score": score,
-            "match_percentage": match_percentage,
-            "skills": found_skills,
-            "missing": missing_skills,
-            "evaluation": evaluation,
-            "summary": f"Detected {len(found_skills)} relevant skills."
-        })
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-# 👇 Important for Render deployment
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run()

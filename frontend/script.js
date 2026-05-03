@@ -1,48 +1,60 @@
 const fileInput = document.getElementById("fileInput");
-const fileStatus = document.getElementById("fileStatus");
+const fileName = document.getElementById("fileName");
 
 fileInput.addEventListener("change", () => {
-    if (fileInput.files.length > 0) {
-        fileStatus.innerText = "✔ " + fileInput.files[0].name;
-    }
+    fileName.innerText = fileInput.files[0].name;
 });
 
 async function uploadFile() {
-
     const file = fileInput.files[0];
-    const loader = document.getElementById("loader");
     const result = document.getElementById("result");
+    const loader = document.getElementById("loader");
 
     if (!file) {
-        alert("Upload a resume first!");
+        alert("Upload a file first");
         return;
     }
 
-    loader.classList.remove("hidden");
-    result.innerHTML = "Analyzing your resume...";
+    loader.style.display = "block";
+    result.innerHTML = "";
 
     const formData = new FormData();
     formData.append("resume", file);
 
     try {
-        const response = await fetch("https://resume-analyzer-ehx2.onrender.com/analyze", {
+        const response = await fetch("https://YOUR-RENDER-URL.onrender.com/analyze", {
             method: "POST",
             body: formData
         });
 
         const data = await response.json();
 
+        loader.style.display = "none";
+
+        // Chart
+        const ctx = document.getElementById("scoreChart").getContext("2d");
+        new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                datasets: [{
+                    data: [data.match_percentage, 100 - data.match_percentage]
+                }]
+            },
+            options: {
+                cutout: "70%"
+            }
+        });
+
         result.innerHTML = `
-            <div class="result-card">🔥 Score: ${data.score}/10</div>
-            <div class="result-card">📊 Match: ${data.match_percentage}%</div>
-            <div class="result-card">🧠 Skills: ${data.skills.join(", ")}</div>
-            <div class="result-card">⚠ Missing: ${data.missing.join(", ")}</div>
-            <div class="result-card">💡 ${data.evaluation}</div>
+            <div class="card">🔥 Score: ${data.score}/10</div>
+            <div class="card">📊 Match: ${data.match_percentage}%</div>
+            <div class="card">🧠 Skills: ${data.skills.join(", ")}</div>
+            <div class="card">⚠ Missing: ${data.missing.join(", ")}</div>
+            <div class="card">💡 ${data.evaluation}</div>
         `;
 
     } catch (err) {
+        loader.style.display = "none";
         result.innerHTML = "❌ Backend error";
     }
-
-    loader.classList.add("hidden");
 }
